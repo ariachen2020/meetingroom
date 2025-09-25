@@ -12,16 +12,14 @@ import BookingModal from '@/components/BookingModal'
 import DeleteModal from '@/components/DeleteModal'
 
 interface PageProps {
-  params: Promise<{
+  params: {
     roomId: string
     date: string
-  }>
+  }
 }
 
 export default function DatePage({ params }: PageProps) {
-  const [roomId, setRoomId] = React.useState('')
-  const [date, setDate] = React.useState('')
-  const [isParamsLoaded, setIsParamsLoaded] = React.useState(false)
+  const { roomId, date } = params
   const router = useRouter()
   
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -32,15 +30,6 @@ export default function DatePage({ params }: PageProps) {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('')
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
   const [message, setMessage] = useState('')
-
-  // Load params
-  useEffect(() => {
-    params.then(({ roomId: r, date: d }) => {
-      setRoomId(r)
-      setDate(d)
-      setIsParamsLoaded(true)
-    })
-  }, [params])
 
   const fetchBookingsCallback = React.useCallback(async () => {
     setIsLoading(true)
@@ -57,16 +46,15 @@ export default function DatePage({ params }: PageProps) {
     }
   }, [roomId, date])
 
+  // Load params
   useEffect(() => {
-    if (!isParamsLoaded) return
-    
     if (!isValidDate(date) || (roomId !== 'A' && roomId !== 'B')) {
       router.push('/')
       return
     }
     
     fetchBookingsCallback()
-  }, [isParamsLoaded, roomId, date, router, fetchBookingsCallback])
+  }, [roomId, date, router, fetchBookingsCallback])
 
   useEffect(() => {
     const slots = getTimeSlots()
@@ -161,16 +149,6 @@ export default function DatePage({ params }: PageProps) {
   const openDeleteModal = (booking: Booking) => {
     setSelectedBooking(booking)
     setDeleteModalOpen(true)
-  }
-
-  if (!isParamsLoaded) {
-    return (
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-        </div>
-      </div>
-    )
   }
 
   if (!isValidDate(date) || (roomId !== 'A' && roomId !== 'B')) {
