@@ -1,18 +1,17 @@
-FROM node:18-alpine AS base
+# Use the official Node.js runtime as a base image
+FROM node:18-alpine
 
-# Install dependencies only when needed
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
+# Set the working directory
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
+# Install dependencies
+RUN apk add --no-cache libc6-compat
+
+# Copy package files
+COPY package*.json ./
 RUN npm ci
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copy the rest of the application
 COPY . .
 
 # Generate Prisma client
@@ -21,35 +20,24 @@ RUN npx prisma generate
 # Build the application
 RUN npm run build
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
-
+# Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Create directories for database and backups
 RUN mkdir -p /app/data /app/backups
+RUN chown -R nextjs:nodejs /app
 
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-
-# Copy built application
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy prisma files
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-
+# Switch to non-root user
 USER nextjs
 
+# Expose the port the app runs on
 EXPOSE 3000
 
+# Set environment variables
+ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+# Start the application
+CMD ["npm", "start"]
