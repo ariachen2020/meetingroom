@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { deleteBooking, getBookingById } from '@/lib/storage'
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -20,9 +20,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId }
-    })
+    const booking = await getBookingById(bookingId)
 
     if (!booking) {
       return NextResponse.json(
@@ -49,9 +47,14 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    await prisma.booking.delete({
-      where: { id: bookingId }
-    })
+    const success = await deleteBooking(bookingId)
+
+    if (!success) {
+      return NextResponse.json(
+        { message: '刪除失敗' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,

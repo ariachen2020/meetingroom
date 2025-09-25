@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { getBookings } from '@/lib/storage'
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,58 +14,37 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    const allBookings = await getBookings()
+    let filteredBookings = allBookings.filter(b => b.roomId === roomId)
+
     if (date) {
       if (date.length === 10) {
-        const bookings = await prisma.booking.findMany({
-          where: {
-            roomId,
-            date
-          },
-          orderBy: {
-            timeSlot: 'asc'
-          }
-        })
-
-        return NextResponse.json({
-          bookings: bookings.map(booking => ({
-            ...booking,
-            createdAt: booking.createdAt.toISOString()
-          }))
-        })
+        // Single date: YYYY-MM-DD
+        filteredBookings = filteredBookings.filter(b => b.date === date)
       } else if (date.length === 7) {
-        const startDate = `${date}-01`
-        const year = parseInt(date.substring(0, 4))
-        const month = parseInt(date.substring(5, 7))
-        const lastDay = new Date(year, month, 0).getDate()
-        const endDate = `${date}-${lastDay.toString().padStart(2, '0')}`
-
-        const bookings = await prisma.booking.findMany({
-          where: {
-            roomId,
-            date: {
-              gte: startDate,
-              lte: endDate
-            }
-          },
-          orderBy: [
-            { date: 'asc' },
-            { timeSlot: 'asc' }
-          ]
-        })
-
-        return NextResponse.json({
-          bookings: bookings.map(booking => ({
-            ...booking,
-            createdAt: booking.createdAt.toISOString()
-          }))
-        })
+        // Month: YYYY-MM
+        filteredBookings = filteredBookings.filter(b => b.date.startsWith(date))
+      } else {
+        return NextResponse.json(
+          { error: 'Invalid date format' },
+          { status: 400 }
+        )
       }
     }
 
-    return NextResponse.json(
-      { error: 'Invalid date format' },
-      { status: 400 }
-    )
+    // Sort by date and time slot
+    filteredBookings.sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date)
+      if (dateCompare !== 0) return dateCompare
+      return a.timeSlot.localeCompare(b.timeSlot)
+    })
+
+    return NextResponse.json({
+      bookings: filteredBookings.map(booking => ({
+        ...booking,
+        createdAt: booking.createdAt.toISOString()
+      }))
+    })
   } catch (error) {
     console.error('GET /api/bookings error:', error)
     return NextResponse.json(
