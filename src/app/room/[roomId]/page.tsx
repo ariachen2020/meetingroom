@@ -1,0 +1,129 @@
+import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { ArrowLeft, MapPin, Users } from 'lucide-react'
+import { format, startOfMonth, endOfMonth } from 'date-fns'
+import { prisma } from '@/lib/prisma'
+import { CalendarDay } from '@/types'
+import Calendar from '@/components/Calendar'
+
+interface PageProps {
+  params: Promise<{
+    roomId: string
+  }>
+  searchParams: Promise<{
+    month?: string
+  }>
+}
+
+async function getCalendarData(roomId: string, month: string): Promise<CalendarDay[]> {
+  const currentDate = month ? new Date(month) : new Date()
+  const monthStart = startOfMonth(currentDate)
+  const monthEnd = endOfMonth(currentDate)
+  
+  const startDateStr = format(monthStart, 'yyyy-MM-dd')
+  const endDateStr = format(monthEnd, 'yyyy-MM-dd')
+
+  const bookings = await prisma.booking.findMany({
+    where: {
+      roomId,
+      date: {
+        gte: startDateStr,
+        lte: endDateStr
+      }
+    },
+    orderBy: [
+      { date: 'asc' },
+      { timeSlot: 'asc' }
+    ]
+  })
+
+  const calendarData: CalendarDay[] = []
+  const bookingsByDate = new Map<string, typeof bookings>()
+
+  bookings.forEach(booking => {
+    const existing = bookingsByDate.get(booking.date) || []
+    existing.push(booking)
+    bookingsByDate.set(booking.date, existing)
+  })
+
+  for (const [date, dateBookings] of bookingsByDate) {
+    calendarData.push({
+      date,
+      bookings: dateBookings,
+      hasBookings: dateBookings.length > 0
+    })
+  }
+
+  return calendarData
+}
+
+function LoadingCalendar() {
+  return (
+    <div className="bg-white rounded-xl shadow-lg p-6">
+      <div className="animate-pulse">
+        <div className="flex items-center justify-between mb-6">
+          <div className="w-8 h-8 bg-gray-200 rounded"></div>
+          <div className="w-32 h-6 bg-gray-200 rounded"></div>
+          <div className="w-8 h-8 bg-gray-200 rounded"></div>
+        </div>
+        <div className="grid grid-cols-7 gap-2">
+          {Array.from({ length: 35 }).map((_, i) => (
+            <div key={i} className="h-20 bg-gray-200 rounded-lg"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default async function RoomPage({ params, searchParams }: PageProps) {
+  const { roomId } = await params
+  const { month: monthParam } = await searchParams
+  const month = monthParam || format(new Date(), 'yyyy-MM')
+
+  if (roomId !== 'A' && roomId !== 'B') {
+    notFound()
+  }
+
+  const currentDate = new Date(month + '-01')
+  const calendarData = await getCalendarData(roomId, month)
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center mb-8">
+        <Link
+          href="/"
+          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span>返回會議室選擇</span>
+        </Link>
+      </div>
+
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center space-x-3 mb-4">
+          {roomId === 'A' ? (
+            <MapPin className="w-8 h-8 text-primary-600" />
+          ) : (
+            <Users className="w-8 h-8 text-primary-600" />
+          )}
+          <h1 className="text-3xl font-bold text-gray-900">
+            會議室 {roomId}
+          </h1>
+        </div>
+        <p className="text-gray-600">
+          點擊日期查看詳細預約資訊或進行預約
+        </p>
+      </div>
+
+      <Suspense fallback={<LoadingCalendar />}>
+        <Calendar 
+          roomId={roomId} 
+          currentDate={currentDate}
+          calendarData={calendarData}
+        />
+      </Suspense>
+    </div>
+  )
+}

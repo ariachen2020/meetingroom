@@ -1,0 +1,27 @@
+name: meetingroom-booking
+services:
+  - name: meetingroom-app
+    source:
+      type: git
+    plan: pro
+    build:
+      type: dockerfile
+      dockerfile: ./Dockerfile
+    environment:
+      DATABASE_URL: file:./data/booking.db
+      BACKUP_SCHEDULE: "0 2 * * *"
+      BACKUP_RETENTION_DAYS: "30"
+      NODE_ENV: production
+    volumes:
+      - name: database
+        mount: /app/data
+      - name: backups
+        mount: /app/backups
+    domains:
+      - meetingroom.zeabur.app
+    
+volumes:
+  - name: database
+    size: 1GB
+  - name: backups
+    size: 5GB
