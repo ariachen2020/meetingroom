@@ -91,7 +91,7 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, booking }: Del
               id="extension"
               value={extension}
               onChange={(e) => setExtension(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 error ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="請輸入分機號碼"

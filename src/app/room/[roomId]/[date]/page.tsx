@@ -167,7 +167,7 @@ export default function DatePage({ params }: PageProps) {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-center min-h-screen">
-          <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full"></div>
+          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
         </div>
       </div>
     )
@@ -220,7 +220,7 @@ export default function DatePage({ params }: PageProps) {
         <div className="divide-y divide-gray-200">
           {isLoading ? (
             <div className="p-8 text-center">
-              <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full mx-auto"></div>
+              <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
               <p className="mt-2 text-gray-600">載入中...</p>
             </div>
           ) : (
@@ -264,7 +264,7 @@ export default function DatePage({ params }: PageProps) {
                       !isPastDate && (
                         <button
                           onClick={() => openBookingModal(slot.time)}
-                          className="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white hover:bg-primary-700 rounded-lg transition-colors"
+                          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
                         >
                           <Plus className="w-4 h-4" />
                           <span>立即預約</span>

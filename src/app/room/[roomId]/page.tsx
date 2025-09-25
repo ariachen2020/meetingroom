@@ -107,9 +107,9 @@ export default async function RoomPage({ params, searchParams }: PageProps) {
       <div className="text-center mb-8">
         <div className="flex items-center justify-center space-x-3 mb-4">
           {roomId === 'A' ? (
-            <MapPin className="w-8 h-8 text-primary-600" />
+            <MapPin className="w-8 h-8 text-blue-600" />
           ) : (
-            <Users className="w-8 h-8 text-primary-600" />
+            <Users className="w-8 h-8 text-blue-600" />
           )}
           <h1 className="text-3xl font-bold text-gray-900">
             會議室 {roomId}

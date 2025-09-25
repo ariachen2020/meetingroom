@@ -207,7 +207,7 @@ export default function BookingModal({
                 id="booker"
                 value={formData.booker}
                 onChange={(e) => setFormData(prev => ({ ...prev, booker: e.target.value }))}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.booker ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="請輸入預約人姓名"
@@ -226,7 +226,7 @@ export default function BookingModal({
                 id="extension"
                 value={formData.extension}
                 onChange={(e) => setFormData(prev => ({ ...prev, extension: e.target.value }))}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.extension ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="請輸入聯絡分機"

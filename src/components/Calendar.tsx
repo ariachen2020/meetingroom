@@ -59,12 +59,12 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
         <span className="text-sm text-gray-700">{format(date, 'd')}</span>
       )
     } else {
-      linkClass += " hover:bg-primary-50 border-2 border-primary-200 bg-primary-25"
+      linkClass += " hover:bg-blue-50 border-2 border-blue-200 bg-blue-25"
       content = (
         <>
-          <span className="text-sm text-primary-700 mb-1">{format(date, 'd')}</span>
+          <span className="text-sm text-blue-700 mb-1">{format(date, 'd')}</span>
           {bookingCount === 1 ? (
-            <CalendarIcon className="w-4 h-4 text-primary-600" />
+            <CalendarIcon className="w-4 h-4 text-blue-600" />
           ) : (
             <div className="flex items-center space-x-1">
               <AlertTriangle className="w-4 h-4 text-orange-500" />
@@ -140,7 +140,7 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
           <span>無預約</span>
         </div>
         <div className="flex items-center space-x-2">
-          <CalendarIcon className="w-4 h-4 text-primary-600" />
+          <CalendarIcon className="w-4 h-4 text-blue-600" />
           <span>有預約</span>
         </div>
         <div className="flex items-center space-x-2">
