@@ -24,6 +24,8 @@ export interface BookingForm {
   booker: string
   extension: string
   timeSlot: string
+  startTime?: string
+  endTime?: string
 }
 
 export interface DeleteBookingRequest {

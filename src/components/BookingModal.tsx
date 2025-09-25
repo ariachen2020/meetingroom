@@ -27,7 +27,9 @@ export default function BookingModal({
   const [formData, setFormData] = useState<BookingForm>({
     booker: '',
     extension: '',
-    timeSlot
+    timeSlot: '',
+    startTime: '',
+    endTime: ''
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -45,6 +47,12 @@ export default function BookingModal({
 
     if (!isValidExtension(formData.extension)) {
       newErrors.extension = '分機號碼需要3-5位數字'
+    }
+
+    if (!formData.startTime || !formData.endTime) {
+      newErrors.timeSlot = '請選擇開始和結束時間'
+    } else if (formData.startTime >= formData.endTime) {
+      newErrors.timeSlot = '結束時間必須晚於開始時間'
     }
 
     setErrors(newErrors)
@@ -97,7 +105,7 @@ export default function BookingModal({
   }
 
   const handleClose = () => {
-    setFormData({ booker: '', extension: '', timeSlot })
+    setFormData({ booker: '', extension: '', timeSlot: '', startTime: '', endTime: '' })
     setErrors({})
     setShowConflictWarning(false)
     setConflictBookings([])
@@ -188,14 +196,62 @@ export default function BookingModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                時間
+                預約時間 *
               </label>
-              <input
-                type="text"
-                value={timeSlot}
-                readOnly
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
-              />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">開始時間</label>
+                  <input
+                    type="time"
+                    value={formData.startTime || ''}
+                    onChange={(e) => {
+                      const startTime = e.target.value
+                      const endTime = formData.endTime || ''
+                      const timeSlot = startTime && endTime ? `${startTime}-${endTime}` : ''
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        startTime,
+                        timeSlot 
+                      }))
+                    }}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.timeSlot ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    min="08:00"
+                    max="18:00"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">結束時間</label>
+                  <input
+                    type="time"
+                    value={formData.endTime || ''}
+                    onChange={(e) => {
+                      const endTime = e.target.value
+                      const startTime = formData.startTime || ''
+                      const timeSlot = startTime && endTime ? `${startTime}-${endTime}` : ''
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        endTime,
+                        timeSlot 
+                      }))
+                    }}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.timeSlot ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                    min="08:00"
+                    max="18:00"
+                  />
+                </div>
+              </div>
+              {formData.startTime && formData.endTime && (
+                <p className="mt-1 text-sm text-gray-600">
+                  預約時段：{formData.timeSlot}
+                </p>
+              )}
+              {errors.timeSlot && (
+                <p className="mt-1 text-sm text-red-600">{errors.timeSlot}</p>
+              )}
             </div>
 
             <div>

@@ -6,8 +6,7 @@ import Link from 'next/link'
 import { ArrowLeft, Clock, User, Phone, Plus, Trash2 } from 'lucide-react'
 import { format, isValid, parseISO } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
-import { Booking, BookingForm, TimeSlot } from '@/types'
-import { getTimeSlots } from '@/lib/utils'
+import { Booking, BookingForm } from '@/types'
 import BookingModal from '@/components/BookingModal'
 import DeleteModal from '@/components/DeleteModal'
 
@@ -23,7 +22,6 @@ export default function DatePage({ params }: PageProps) {
   const router = useRouter()
   
   const [bookings, setBookings] = useState<Booking[]>([])
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [bookingModalOpen, setBookingModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -55,19 +53,6 @@ export default function DatePage({ params }: PageProps) {
     
     fetchBookingsCallback()
   }, [roomId, date, router, fetchBookingsCallback])
-
-  useEffect(() => {
-    const slots = getTimeSlots()
-    const timeSlotData: TimeSlot[] = slots.map(slot => {
-      const booking = bookings.find(b => b.timeSlot === slot)
-      return {
-        time: slot,
-        booking,
-        available: !booking
-      }
-    })
-    setTimeSlots(timeSlotData)
-  }, [bookings])
 
   const isValidDate = (dateStr: string): boolean => {
     const parsedDate = parseISO(dateStr)
@@ -191,8 +176,17 @@ export default function DatePage({ params }: PageProps) {
       )}
 
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="px-6 py-4 bg-gray-50 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">預約時程表</h2>
+        <div className="px-6 py-4 bg-gray-50 border-b flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-gray-900">預約清單</h2>
+          {!isPastDate && (
+            <button
+              onClick={() => openBookingModal('')}
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              <span>新增預約</span>
+            </button>
+          )}
         </div>
         
         <div className="divide-y divide-gray-200">
@@ -201,55 +195,41 @@ export default function DatePage({ params }: PageProps) {
               <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
               <p className="mt-2 text-gray-600">載入中...</p>
             </div>
+          ) : bookings.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              今日暫無預約
+            </div>
           ) : (
-            timeSlots.map((slot) => (
-              <div key={slot.time} className="p-6 hover:bg-gray-50">
+            bookings.map((booking) => (
+              <div key={booking.id} className="p-6 hover:bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
                       <Clock className="w-5 h-5 text-gray-400" />
                       <span className="font-medium text-gray-900">
-                        {slot.time}
+                        {booking.timeSlot}
                       </span>
                     </div>
                     
-                    {slot.booking ? (
-                      <div className="flex items-center space-x-4 text-sm">
-                        <div className="flex items-center space-x-2">
-                          <User className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-700">{slot.booking.booker}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Phone className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-700">分機 {slot.booking.extension}</span>
-                        </div>
+                    <div className="flex items-center space-x-4 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <User className="w-4 h-4 text-gray-400" />
+                        <span className="text-gray-700">{booking.booker}</span>
                       </div>
-                    ) : (
-                      <span className="text-gray-500 text-sm">空閒時段</span>
-                    )}
+                      <div className="flex items-center space-x-2">
+                        <Phone className="w-4 h-4 text-gray-400" />
+                        <span className="text-gray-700">分機 {booking.extension}</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    {slot.booking ? (
-                      <button
-                        onClick={() => openDeleteModal(slot.booking!)}
-                        className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        <span>刪除預約</span>
-                      </button>
-                    ) : (
-                      !isPastDate && (
-                        <button
-                          onClick={() => openBookingModal(slot.time)}
-                          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
-                        >
-                          <Plus className="w-4 h-4" />
-                          <span>立即預約</span>
-                        </button>
-                      )
-                    )}
-                  </div>
+                  <button
+                    onClick={() => openDeleteModal(booking)}
+                    className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>刪除</span>
+                  </button>
                 </div>
               </div>
             ))
