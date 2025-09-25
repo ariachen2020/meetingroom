@@ -1,0 +1,19 @@
+services:
+  - name: app
+    source:
+      type: image
+      image:
+        build:
+          type: dockerfile
+    ports:
+      - port: 3000
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: file:/app/data/booking.db
+      BACKUP_SCHEDULE: "0 2 * * *"
+      BACKUP_RETENTION_DAYS: "30"
+    volumes:
+      - name: data
+        mountPath: /app/data
+      - name: backups
+        mountPath: /app/backups
