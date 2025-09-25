@@ -53,7 +53,7 @@ export async function getBookings(): Promise<Booking[]> {
     const data = await fs.readFile(BOOKINGS_FILE, 'utf-8')
     const bookings = JSON.parse(data)
     // Convert createdAt strings back to Date objects
-    return bookings.map((booking: any) => ({
+    return bookings.map((booking: Booking & { createdAt: string }) => ({
       ...booking,
       createdAt: new Date(booking.createdAt)
     }))

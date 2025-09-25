@@ -2,8 +2,8 @@ import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, Users } from 'lucide-react'
-import { format, startOfMonth, endOfMonth } from 'date-fns'
-import { prisma } from '@/lib/prisma'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns'
+import { getBookings } from '@/lib/storage'
 import { CalendarDay } from '@/types'
 import Calendar from '@/components/Calendar'
 
@@ -20,22 +20,25 @@ async function getCalendarData(roomId: string, month: string): Promise<CalendarD
   const currentDate = month ? new Date(month) : new Date()
   const monthStart = startOfMonth(currentDate)
   const monthEnd = endOfMonth(currentDate)
-  
+
   const startDateStr = format(monthStart, 'yyyy-MM-dd')
   const endDateStr = format(monthEnd, 'yyyy-MM-dd')
 
-  const bookings = await prisma.booking.findMany({
-    where: {
-      roomId,
-      date: {
-        gte: startDateStr,
-        lte: endDateStr
-      }
-    },
-    orderBy: [
-      { date: 'asc' },
-      { timeSlot: 'asc' }
-    ]
+  // Get all bookings
+  const allBookings = await getBookings()
+
+  // Filter by room and date range
+  const bookings = allBookings.filter(booking => {
+    return booking.roomId === roomId &&
+           booking.date >= startDateStr &&
+           booking.date <= endDateStr
+  })
+
+  // Sort bookings
+  bookings.sort((a, b) => {
+    const dateCompare = a.date.localeCompare(b.date)
+    if (dateCompare !== 0) return dateCompare
+    return a.timeSlot.localeCompare(b.timeSlot)
   })
 
   const calendarData: CalendarDay[] = []
@@ -118,8 +121,8 @@ export default async function RoomPage({ params, searchParams }: PageProps) {
       </div>
 
       <Suspense fallback={<LoadingCalendar />}>
-        <Calendar 
-          roomId={roomId} 
+        <Calendar
+          roomId={roomId}
           currentDate={currentDate}
           calendarData={calendarData}
         />
