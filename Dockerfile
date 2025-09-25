@@ -9,7 +9,7 @@ RUN apk add --no-cache libc6-compat
 
 # Copy package files
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # Copy the rest of the application
 COPY . .
