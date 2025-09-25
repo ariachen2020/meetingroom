@@ -32,7 +32,6 @@ RUN adduser --system --uid 1001 nextjs
 
 # Create directories for database and backups
 RUN mkdir -p /app/data /app/backups
-RUN chown nextjs:nodejs /app/data /app/backups
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
