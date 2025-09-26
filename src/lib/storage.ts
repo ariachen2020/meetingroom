@@ -110,3 +110,48 @@ export async function getBookingsByRoomAndDate(roomId: string, date: string): Pr
   const bookings = await getBookings()
   return bookings.filter(b => b.roomId === roomId && b.date === date)
 }
+
+// Create recurring bookings
+export async function createRecurringBookings(
+  bookingData: Omit<Booking, 'id' | 'createdAt'>,
+  recurring: { type: 'daily' | 'weekly' | 'monthly'; endDate: string }
+): Promise<Booking[]> {
+  const bookings = await getBookings()
+  const createdBookings: Booking[] = []
+  
+  const startDate = new Date(bookingData.date)
+  const endDate = new Date(recurring.endDate)
+  const currentDate = new Date(startDate)
+  
+  let nextId = bookings.length > 0 ? Math.max(...bookings.map(b => b.id)) + 1 : 1
+  
+  while (currentDate <= endDate) {
+    const dateStr = currentDate.toISOString().split('T')[0]
+    
+    const newBooking: Booking = {
+      ...bookingData,
+      id: nextId++,
+      date: dateStr,
+      createdAt: new Date()
+    }
+    
+    bookings.push(newBooking)
+    createdBookings.push(newBooking)
+    
+    // 計算下一個日期
+    switch (recurring.type) {
+      case 'daily':
+        currentDate.setDate(currentDate.getDate() + 1)
+        break
+      case 'weekly':
+        currentDate.setDate(currentDate.getDate() + 7)
+        break
+      case 'monthly':
+        currentDate.setMonth(currentDate.getMonth() + 1)
+        break
+    }
+  }
+  
+  await saveBookings(bookings)
+  return createdBookings
+}

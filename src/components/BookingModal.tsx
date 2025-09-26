@@ -29,7 +29,12 @@ export default function BookingModal({
     extension: '',
     timeSlot: '',
     startTime: '',
-    endTime: ''
+    endTime: '',
+    recurring: {
+      enabled: false,
+      type: 'weekly',
+      endDate: ''
+    }
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -119,7 +124,18 @@ export default function BookingModal({
   }
 
   const handleClose = () => {
-    setFormData({ booker: '', extension: '', timeSlot: '', startTime: '', endTime: '' })
+    setFormData({ 
+      booker: '', 
+      extension: '', 
+      timeSlot: '', 
+      startTime: '', 
+      endTime: '',
+      recurring: {
+        enabled: false,
+        type: 'weekly',
+        endDate: ''
+      }
+    })
     setErrors({})
     setShowConflictWarning(false)
     setConflictBookings([])
@@ -303,6 +319,66 @@ export default function BookingModal({
               />
               {errors.extension && (
                 <p className="mt-1 text-sm text-red-600">{errors.extension}</p>
+              )}
+            </div>
+
+            <div className="border-t pt-4">
+              <div className="flex items-center space-x-2 mb-3">
+                <input
+                  type="checkbox"
+                  id="recurring"
+                  checked={formData.recurring?.enabled || false}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    recurring: {
+                      ...prev.recurring!,
+                      enabled: e.target.checked
+                    }
+                  }))}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="recurring" className="text-sm font-medium text-gray-700">
+                  循環預約
+                </label>
+              </div>
+
+              {formData.recurring?.enabled && (
+                <div className="space-y-3 pl-6">
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">重複頻率</label>
+                    <select
+                      value={formData.recurring.type}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        recurring: {
+                          ...prev.recurring!,
+                          type: e.target.value as 'daily' | 'weekly' | 'monthly'
+                        }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="daily">每日</option>
+                      <option value="weekly">每週</option>
+                      <option value="monthly">每月</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">結束日期</label>
+                    <input
+                      type="date"
+                      value={formData.recurring.endDate}
+                      onChange={(e) => setFormData(prev => ({
+                        ...prev,
+                        recurring: {
+                          ...prev.recurring!,
+                          endDate: e.target.value
+                        }
+                      }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      min={date}
+                    />
+                  </div>
+                </div>
               )}
             </div>
 

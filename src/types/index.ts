@@ -26,6 +26,11 @@ export interface BookingForm {
   timeSlot: string
   startTime?: string
   endTime?: string
+  recurring?: {
+    enabled: boolean
+    type: 'daily' | 'weekly' | 'monthly'
+    endDate: string
+  }
 }
 
 export interface DeleteBookingRequest {
