@@ -51,8 +51,22 @@ export default function BookingModal({
 
     if (!formData.startTime || !formData.endTime) {
       newErrors.timeSlot = '請選擇開始和結束時間'
-    } else if (formData.startTime >= formData.endTime) {
-      newErrors.timeSlot = '結束時間必須晚於開始時間'
+    } else {
+      // 驗證時間格式和範圍
+      const startTime = formData.startTime
+      const endTime = formData.endTime
+      
+      if (startTime >= endTime) {
+        newErrors.timeSlot = '結束時間必須晚於開始時間'
+      } else {
+        // 檢查時間是否在營業時間內 (8:00-18:00)
+        const [startHour] = startTime.split(':').map(Number)
+        const [endHour] = endTime.split(':').map(Number)
+        
+        if (startHour < 8 || endHour > 18) {
+          newErrors.timeSlot = '預約時間必須在 08:00-18:00 之間'
+        }
+      }
     }
 
     setErrors(newErrors)

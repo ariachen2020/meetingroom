@@ -23,8 +23,23 @@ export function getTimeSlots(): string[] {
 }
 
 export function isValidTimeSlot(timeSlot: string): boolean {
-  const timeSlots = getTimeSlots()
-  return timeSlots.includes(timeSlot)
+  // 驗證時間格式：HH:MM-HH:MM
+  const timePattern = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]-([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+  if (!timePattern.test(timeSlot)) {
+    return false
+  }
+
+  const [startTime, endTime] = timeSlot.split('-')
+  const [startHour, startMin] = startTime.split(':').map(Number)
+  const [endHour, endMin] = endTime.split(':').map(Number)
+  
+  const startMinutes = startHour * 60 + startMin
+  const endMinutes = endHour * 60 + endMin
+  
+  // 檢查時間範圍是否合理
+  return startMinutes < endMinutes && 
+         startMinutes >= 8 * 60 && // 最早 8:00
+         endMinutes <= 18 * 60     // 最晚 18:00
 }
 
 export function isValidExtension(extension: string): boolean {
