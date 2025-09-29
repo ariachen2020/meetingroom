@@ -7,8 +7,8 @@ echo "Checking database directory..."
 mkdir -p /app/data /app/backups
 
 echo "Setting up database..."
-# Run migration fix script first
-/app/scripts/fix-migration.sh
+# Use the dedicated database initialization script
+/app/scripts/init-db.sh
 
 echo "Verifying Prisma client..."
 npx prisma generate

@@ -35,12 +35,14 @@ COPY scripts/backup.sh /app/scripts/backup.sh
 COPY scripts/verify-backups.sh /app/scripts/verify-backups.sh
 COPY scripts/monitor-backups.sh /app/scripts/monitor-backups.sh
 COPY scripts/fix-migration.sh /app/scripts/fix-migration.sh
+COPY scripts/init-db.sh /app/scripts/init-db.sh
 COPY scripts/crontab /etc/cron.d/backup-cron
 
 RUN chmod +x /app/scripts/backup.sh \
     && chmod +x /app/scripts/verify-backups.sh \
     && chmod +x /app/scripts/monitor-backups.sh \
     && chmod +x /app/scripts/fix-migration.sh \
+    && chmod +x /app/scripts/init-db.sh \
     && chmod 0644 /etc/cron.d/backup-cron \
     && crontab /etc/cron.d/backup-cron
 

@@ -1,36 +1,33 @@
 #!/bin/bash
 
 # Deployment script for Zeabur
+# This script prepares the application for deployment
+
 set -e
 
-echo "🚀 Deploying to Zeabur..."
+echo "=== Preparing for Zeabur Deployment ==="
 
-# Build and push to Zeabur
-echo "📦 Building application..."
+# Build the application
+echo "Building application..."
 npm run build
 
-echo "🔧 Generating Prisma client..."
-npx prisma generate
+# Commit changes
+echo "Committing changes..."
+git add .
+git commit -m "Fix database initialization for Zeabur deployment" || echo "No changes to commit"
 
-echo "📊 Checking database..."
-npx prisma db push
+# Push to repository
+echo "Pushing to repository..."
+git push origin main
 
-echo "✅ Deployment preparation complete!"
-echo "📋 Next steps:"
-echo "1. Push your code to your git repository"
-echo "2. Connect your repository to Zeabur"
-echo "3. Configure environment variables in Zeabur dashboard"
-echo "4. Set up volumes for /app/data and /app/backups"
-echo "5. Deploy!"
-
+echo "=== Deployment Preparation Complete ==="
+echo "Please check Zeabur dashboard for deployment status"
+echo "Make sure the following environment variables are set in Zeabur:"
+echo "  DATABASE_URL=file:/app/data/booking.db"
+echo "  NODE_ENV=production"
+echo "  BACKUP_SCHEDULE=0 2 * * *"
+echo "  BACKUP_RETENTION_DAYS=30"
 echo ""
-echo "🔧 Required Environment Variables:"
-echo "   DATABASE_URL=file:./data/booking.db"
-echo "   BACKUP_SCHEDULE=0 2 * * *"
-echo "   BACKUP_RETENTION_DAYS=30"
-echo "   NODE_ENV=production"
-
-echo ""
-echo "💾 Required Volumes:"
-echo "   /app/data (for SQLite database)"
-echo "   /app/backups (for backup files)"
+echo "Make sure the following volumes are mounted:"
+echo "  data -> /app/data"
+echo "  backups -> /app/backups"

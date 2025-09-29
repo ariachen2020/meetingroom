@@ -10,15 +10,30 @@ echo "=== Database Migration Fix ==="
 DB_PATH="${DATABASE_URL#file:}"
 echo "Database path: $DB_PATH"
 
-# Check if database exists
-if [ ! -f "$DB_PATH" ]; then
-    echo "Database doesn't exist, creating new one..."
-    npx prisma migrate deploy
+# Ensure directory exists
+mkdir -p "$(dirname "$DB_PATH")"
+
+# Check if database exists and has content
+if [ ! -f "$DB_PATH" ] || [ ! -s "$DB_PATH" ]; then
+    echo "Database doesn't exist or is empty, creating new one..."
+    
+    # Remove empty file if exists
+    rm -f "$DB_PATH"
+    
+    # Run migrations to create database
+    npx prisma migrate deploy || {
+        echo "Migration deploy failed, using db push..."
+        npx prisma db push --force-reset
+    }
+    
+    echo "Database created successfully"
     exit 0
 fi
 
+# Database exists and has content, check schema
+echo "Database exists, checking schema..."
+
 # Check if order_index column exists
-echo "Checking if order_index column exists..."
 ORDER_INDEX_EXISTS=$(sqlite3 "$DB_PATH" "PRAGMA table_info(bookings);" | grep -c "order_index" || echo "0")
 
 if [ "$ORDER_INDEX_EXISTS" = "0" ]; then
