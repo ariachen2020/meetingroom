@@ -15,7 +15,10 @@ if [ ! -f "/app/data/booking.db" ]; then
     }
 else
     echo "Database exists, running migrations..."
-    npx prisma migrate deploy || echo "Warning: Migration failed, but continuing..."
+    npx prisma migrate deploy || {
+        echo "Migration deploy failed, trying db push to ensure schema is up to date..."
+        npx prisma db push || echo "Warning: Database schema sync failed"
+    }
 fi
 
 echo "Verifying Prisma client..."
