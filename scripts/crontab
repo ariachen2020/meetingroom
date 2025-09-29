@@ -1,0 +1,6 @@
+# Meeting Room Booking Database Backup Schedule
+# Runs daily at 2 AM, keeping backups for 30 days
+0 2 * * * /app/scripts/backup.sh >> /app/backups/cron.log 2>&1
+
+# Weekly backup verification at 3 AM on Sundays
+0 3 * * 0 /app/scripts/verify-backups.sh >> /app/backups/verify.log 2>&1

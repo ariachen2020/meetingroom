@@ -3,6 +3,12 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Install system dependencies for backups and cron
+RUN apk add --no-cache \
+    sqlite \
+    dcron \
+    tini
+
 # Copy package files
 COPY package*.json ./
 
@@ -22,7 +28,19 @@ RUN npx prisma generate && npm run build
 RUN npm prune --production
 
 # Create directories for data and backups
-RUN mkdir -p /app/data /app/backups
+RUN mkdir -p /app/data /app/backups /var/log/cron
+
+# Copy backup scripts and make them executable
+COPY scripts/backup.sh /app/scripts/backup.sh
+COPY scripts/verify-backups.sh /app/scripts/verify-backups.sh
+COPY scripts/monitor-backups.sh /app/scripts/monitor-backups.sh
+COPY scripts/crontab /etc/cron.d/backup-cron
+
+RUN chmod +x /app/scripts/backup.sh \
+    && chmod +x /app/scripts/verify-backups.sh \
+    && chmod +x /app/scripts/monitor-backups.sh \
+    && chmod 0644 /etc/cron.d/backup-cron \
+    && crontab /etc/cron.d/backup-cron
 
 # Set the database URL environment variable directly in the image
 ENV DATABASE_URL="file:/app/data/booking.db"
@@ -35,4 +53,6 @@ EXPOSE 3000
 COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh
 RUN chmod +x /app/scripts/entrypoint.sh
 
+# Use tini as init system to handle signals properly
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/app/scripts/entrypoint.sh"]
