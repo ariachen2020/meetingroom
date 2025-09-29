@@ -13,3 +13,8 @@ README.md
 coverage
 .nyc_output
 .claude
+backups/*
+data/*
+WORK_LOG_*.md
+TASK_SUMMARY.md
+DEPLOYMENT.md

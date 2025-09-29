@@ -1,21 +1,14 @@
+name: meetingroom-booking
+
 services:
-  - name: app
-    source:
-      type: image
-      image:
-        build:
-          type: dockerfile
-        release:
-          command: npx prisma generate && npx prisma migrate deploy
-    ports:
-      - port: 3000
+  app:
+    type: dockerfile
+    dockerfile: Dockerfile
     environment:
       NODE_ENV: production
       DATABASE_URL: file:/app/data/booking.db
       BACKUP_SCHEDULE: "0 2 * * *"
       BACKUP_RETENTION_DAYS: "30"
     volumes:
-      - name: data
-        mountPath: /app/data
-      - name: backups
-        mountPath: /app/backups
+      - data:/app/data
+      - backups:/app/backups
