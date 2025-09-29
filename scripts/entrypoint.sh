@@ -21,5 +21,6 @@ fi
 echo "Verifying Prisma client..."
 npx prisma generate
 
-echo "Starting Next.js application on port ${PORT:-3000}..."
+echo "Starting Next.js application..."
+echo "PORT is set to: ${PORT}"
 exec npm start
