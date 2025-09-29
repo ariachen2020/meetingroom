@@ -42,7 +42,7 @@ export default function Calendar({ roomId, currentDate, calendarData: initialDat
           const data = await response.json()
           
           // Transform bookings to calendar data format
-          const bookingsByDate = new Map()
+          const bookingsByDate = new Map<string, any[]>()
           data.bookings.forEach((booking: any) => {
             const existing = bookingsByDate.get(booking.date) || []
             existing.push(booking)
@@ -55,7 +55,7 @@ export default function Calendar({ roomId, currentDate, calendarData: initialDat
             timeSlots.sort((a, b) => a.localeCompare(b))
 
             newCalendarData.push({
-              date,
+              date: date as string,
               bookings: dateBookings,
               hasBookings: dateBookings.length > 0,
               timeSlots
