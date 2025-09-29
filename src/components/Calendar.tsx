@@ -52,7 +52,7 @@ export default function Calendar({ roomId, currentDate, calendarData: initialDat
           const newCalendarData: CalendarDay[] = []
           for (const [date, dateBookings] of bookingsByDate) {
             const timeSlots = [...new Set(dateBookings.map((b: any) => b.timeSlot))]
-              .sort((a, b) => a.localeCompare(b))
+              .sort((a: string, b: string) => a.localeCompare(b))
 
             newCalendarData.push({
               date,
