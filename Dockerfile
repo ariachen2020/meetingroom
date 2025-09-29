@@ -22,5 +22,7 @@ RUN mkdir -p /app/data /app/backups
 # Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "start"]
+# Start the application by running the entrypoint script
+COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh
+RUN chmod +x /app/scripts/entrypoint.sh
+CMD ["/app/scripts/entrypoint.sh"]
