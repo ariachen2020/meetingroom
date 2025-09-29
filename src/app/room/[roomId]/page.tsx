@@ -51,10 +51,15 @@ async function getCalendarData(roomId: string, month: string): Promise<CalendarD
   })
 
   for (const [date, dateBookings] of bookingsByDate) {
+    // Extract unique time slots for this date, sorted
+    const timeSlots = [...new Set(dateBookings.map(b => b.timeSlot))]
+      .sort((a, b) => a.localeCompare(b))
+
     calendarData.push({
       date,
       bookings: dateBookings,
-      hasBookings: dateBookings.length > 0
+      hasBookings: dateBookings.length > 0,
+      timeSlots
     })
   }
 
@@ -72,7 +77,7 @@ function LoadingCalendar() {
         </div>
         <div className="grid grid-cols-7 gap-2">
           {Array.from({ length: 35 }).map((_, i) => (
-            <div key={i} className="h-20 bg-gray-200 rounded-lg"></div>
+            <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
           ))}
         </div>
       </div>

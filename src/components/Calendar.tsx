@@ -27,6 +27,12 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
     return dayData ? dayData.bookings.length : 0
   }
 
+  const getTimeSlotsForDate = (date: Date) => {
+    const dateString = format(date, 'yyyy-MM-dd')
+    const dayData = calendarData.find(day => day.date === dateString)
+    return dayData ? dayData.timeSlots : []
+  }
+
   const previousMonth = async () => {
     setIsLoading(true)
     setSelectedMonth(subMonths(selectedMonth, 1))
@@ -42,11 +48,12 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
   const renderCalendarDay = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd')
     const bookingCount = getBookingCountForDate(date)
+    const timeSlots = getTimeSlotsForDate(date)
     const isCurrentMonth = isSameMonth(date, selectedMonth)
     const isPastDate = date < new Date(new Date().setHours(0, 0, 0, 0))
 
     let content
-    let linkClass = "flex flex-col items-center justify-center h-20 p-2 rounded-lg transition-all duration-200"
+    let linkClass = "flex flex-col items-center justify-center h-24 p-2 rounded-lg transition-all duration-200"
 
     if (!isCurrentMonth) {
       linkClass += " text-gray-300 cursor-not-allowed"
@@ -60,19 +67,25 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
       )
     } else {
       linkClass += " hover:bg-blue-50 border-2 border-blue-200 bg-blue-25"
+      const maxDisplaySlots = 2
+      const displaySlots = timeSlots.slice(0, maxDisplaySlots)
+      const remainingCount = timeSlots.length - maxDisplaySlots
+
       content = (
         <>
-          <span className="text-sm text-blue-700 mb-1">{format(date, 'd')}</span>
-          {bookingCount === 1 ? (
-            <CalendarIcon className="w-4 h-4 text-blue-600" />
-          ) : (
-            <div className="flex items-center space-x-1">
-              <AlertTriangle className="w-4 h-4 text-orange-500" />
-              <span className="text-xs text-orange-600 font-semibold">
-                {bookingCount}
-              </span>
-            </div>
-          )}
+          <span className="text-sm text-blue-700 mb-1 font-medium">{format(date, 'd')}</span>
+          <div className="flex flex-col items-center space-y-0.5 text-xs w-full">
+            {displaySlots.map((slot, index) => (
+              <div key={index} className="px-1 py-0.5 bg-blue-100 text-blue-800 rounded text-xs leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                {slot}
+              </div>
+            ))}
+            {remainingCount > 0 && (
+              <div className="px-1 py-0.5 bg-orange-100 text-orange-800 rounded text-xs leading-tight">
+                +{remainingCount}個
+              </div>
+            )}
+          </div>
         </>
       )
     }
@@ -127,7 +140,7 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
         
         {isLoading ? (
           Array.from({ length: 35 }).map((_, i) => (
-            <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+            <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
           ))
         ) : (
           calendarDays.map(renderCalendarDay)
@@ -140,12 +153,15 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
           <span>無預約</span>
         </div>
         <div className="flex items-center space-x-2">
-          <CalendarIcon className="w-4 h-4 text-blue-600" />
-          <span>有預約</span>
+          <div className="w-4 h-4 bg-blue-100 border-2 border-blue-200 rounded"></div>
+          <span>顯示預約時段</span>
         </div>
         <div className="flex items-center space-x-2">
-          <AlertTriangle className="w-4 h-4 text-orange-500" />
-          <span>重疊預約</span>
+          <div className="w-4 h-4 bg-orange-100 border border-orange-200 rounded text-xs flex items-center justify-center">+</div>
+          <span>更多時段</span>
+        </div>
+        <div className="text-xs text-gray-500">
+          點擊日期查看完整預約詳情
         </div>
       </div>
     </div>

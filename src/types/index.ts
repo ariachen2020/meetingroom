@@ -20,6 +20,7 @@ export interface CalendarDay {
   date: string
   bookings: Booking[]
   hasBookings: boolean
+  timeSlots: string[]
 }
 
 export interface BookingForm {
