@@ -6,7 +6,7 @@ services:
         build:
           type: dockerfile
         release:
-          command: npx prisma migrate deploy
+          command: npx prisma generate && npx prisma migrate deploy
     ports:
       - port: 3000
     environment:
