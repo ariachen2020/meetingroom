@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { CalendarDay } from '@/types'
 
@@ -13,9 +13,10 @@ interface CalendarProps {
   calendarData: CalendarDay[]
 }
 
-export default function Calendar({ roomId, currentDate, calendarData }: CalendarProps) {
+export default function Calendar({ roomId, currentDate, calendarData: initialData }: CalendarProps) {
   const [selectedMonth, setSelectedMonth] = useState(currentDate)
   const [isLoading, setIsLoading] = useState(false)
+  const [calendarData, setCalendarData] = useState(initialData)
   
   const monthStart = startOfMonth(selectedMonth)
   const monthEnd = endOfMonth(selectedMonth)
@@ -24,6 +25,54 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 }) // 0 = Sunday
   const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 })
   const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
+
+  // Fetch data when month changes
+  useEffect(() => {
+    const fetchMonthData = async () => {
+      if (format(selectedMonth, 'yyyy-MM') === format(currentDate, 'yyyy-MM')) {
+        setCalendarData(initialData)
+        return
+      }
+
+      setIsLoading(true)
+      try {
+        const monthStr = format(selectedMonth, 'yyyy-MM')
+        const response = await fetch(`/api/bookings?roomId=${roomId}&date=${monthStr}`)
+        if (response.ok) {
+          const data = await response.json()
+          
+          // Transform bookings to calendar data format
+          const bookingsByDate = new Map()
+          data.bookings.forEach((booking: any) => {
+            const existing = bookingsByDate.get(booking.date) || []
+            existing.push(booking)
+            bookingsByDate.set(booking.date, existing)
+          })
+
+          const newCalendarData: CalendarDay[] = []
+          for (const [date, dateBookings] of bookingsByDate) {
+            const timeSlots = [...new Set(dateBookings.map((b: any) => b.timeSlot))]
+              .sort((a, b) => a.localeCompare(b))
+
+            newCalendarData.push({
+              date,
+              bookings: dateBookings,
+              hasBookings: dateBookings.length > 0,
+              timeSlots
+            })
+          }
+          
+          setCalendarData(newCalendarData)
+        }
+      } catch (error) {
+        console.error('Failed to fetch calendar data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchMonthData()
+  }, [selectedMonth, roomId, currentDate, initialData])
 
   const getBookingCountForDate = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd')
@@ -37,16 +86,12 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
     return dayData ? dayData.timeSlots : []
   }
 
-  const previousMonth = async () => {
-    setIsLoading(true)
+  const previousMonth = () => {
     setSelectedMonth(subMonths(selectedMonth, 1))
-    setTimeout(() => setIsLoading(false), 300)
   }
 
-  const nextMonth = async () => {
-    setIsLoading(true)
+  const nextMonth = () => {
     setSelectedMonth(addMonths(selectedMonth, 1))
-    setTimeout(() => setIsLoading(false), 300)
   }
 
   const renderCalendarDay = (date: Date) => {
@@ -55,9 +100,15 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
     const timeSlots = getTimeSlotsForDate(date)
     const isCurrentMonth = isSameMonth(date, selectedMonth)
     const isPastDate = date < new Date(new Date().setHours(0, 0, 0, 0))
+    const isToday = format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
 
     let content
-    let linkClass = "flex flex-col items-center justify-center h-24 p-2 rounded-lg transition-all duration-200"
+    let linkClass = "flex flex-col items-center justify-center h-24 p-2 rounded-lg transition-all duration-200 relative"
+
+    // 今天的紅色圈圈
+    if (isToday && isCurrentMonth) {
+      linkClass += " ring-2 ring-red-500"
+    }
 
     if (!isCurrentMonth) {
       linkClass += " text-gray-300 cursor-not-allowed"
@@ -67,17 +118,21 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
     } else if (bookingCount === 0) {
       linkClass += " hover:bg-gray-100 border-2 border-gray-200"
       content = (
-        <span className="text-sm text-gray-700">{format(date, 'd')}</span>
+        <span className={`text-sm ${isToday ? 'text-red-600 font-bold' : 'text-gray-700'}`}>
+          {format(date, 'd')}
+        </span>
       )
     } else {
-      linkClass += " hover:bg-blue-50 border-2 border-blue-200 bg-blue-25"
-      const maxDisplaySlots = 2
+      linkClass += " hover:bg-blue-50 border-2 border-blue-200 bg-blue-50"
+      const maxDisplaySlots = 3
       const displaySlots = timeSlots.slice(0, maxDisplaySlots)
       const remainingCount = timeSlots.length - maxDisplaySlots
 
       content = (
         <>
-          <span className="text-sm text-blue-700 mb-1 font-medium">{format(date, 'd')}</span>
+          <span className={`text-sm mb-1 font-medium ${isToday ? 'text-red-600' : 'text-blue-700'}`}>
+            {format(date, 'd')}
+          </span>
           <div className="flex flex-col items-center space-y-0.5 text-xs w-full">
             {displaySlots.map((slot, index) => (
               <div key={index} className="px-1 py-0.5 bg-blue-100 text-blue-800 rounded text-xs leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
