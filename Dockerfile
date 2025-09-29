@@ -19,6 +19,9 @@ RUN npx prisma generate && npm run build
 # Create directories for data and backups
 RUN mkdir -p /app/data /app/backups
 
+# Set the database URL environment variable directly in the image
+ENV DATABASE_URL="file:/app/data/booking.db"
+
 # Expose port
 EXPOSE 3000
 
