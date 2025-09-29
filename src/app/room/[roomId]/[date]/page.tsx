@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Clock, User, Phone, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Clock, User, Phone, Plus, Trash2, BookText } from 'lucide-react'
 import { format, isValid, parseISO } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { Booking, BookingForm } from '@/types'
@@ -73,7 +73,9 @@ export default function DatePage({ params }: PageProps) {
           timeSlot: formData.timeSlot,
           booker: formData.booker,
           extension: formData.extension,
-          force: formData.forceBook || false
+          title: formData.title,
+          recurring: formData.recurring,
+          forceBook: formData.forceBook || false
         }),
       })
 
@@ -210,6 +212,12 @@ export default function DatePage({ params }: PageProps) {
                         {booking.timeSlot}
                       </span>
                     </div>
+                    {booking.title && (
+                      <div className="flex items-center space-x-2">
+                        <BookText className="w-5 h-5 text-gray-400" />
+                        <span className="font-medium text-gray-900">{booking.title}</span>
+                      </div>
+                    )}
                     
                     <div className="flex items-center space-x-4 text-sm">
                       <div className="flex items-center space-x-2">

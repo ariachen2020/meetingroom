@@ -5,6 +5,7 @@ export interface Booking {
   timeSlot: string
   booker: string
   extension: string
+  title: string | null
   createdAt: Date
 }
 
@@ -23,6 +24,7 @@ export interface CalendarDay {
 export interface BookingForm {
   booker: string
   extension: string
+  title?: string
   timeSlot: string
   startTime?: string
   endTime?: string

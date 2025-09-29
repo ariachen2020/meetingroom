@@ -5,7 +5,7 @@ import { isValidTimeSlot, isValidExtension, isValidBooker } from '@/lib/utils'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { roomId, date, timeSlot, booker, extension, recurring, forceBook } = body
+    const { roomId, date, timeSlot, booker, extension, recurring, forceBook, title } = body
 
     // Validation
     if (!roomId || (roomId !== 'A' && roomId !== 'B')) {
@@ -43,6 +43,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (title && title.length > 100) {
+      return NextResponse.json(
+        { message: '會議名稱不能超過100個字元' },
+        { status: 400 }
+      )
+    }
+
     // Check for existing booking if not forcing
     if (!forceBook) {
       const existingBookings = await getBookingsByRoomAndDate(roomId, date)
@@ -62,7 +69,8 @@ export async function POST(request: NextRequest) {
       date,
       timeSlot,
       booker: booker.trim(),
-      extension: extension.trim()
+      extension: extension.trim(),
+      title: title ? title.trim() : null
     }
 
     // Handle recurring bookings

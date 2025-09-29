@@ -15,6 +15,7 @@ model Booking {
   roomId    String   @map("room_id")
   date      String
   timeSlot  String   @map("time_slot")
+  title     String?
   booker    String
   extension String
   createdAt DateTime @default(now()) @map("created_at")

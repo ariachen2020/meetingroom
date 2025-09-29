@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import TimePicker from 'react-time-picker'
+import 'react-time-picker/dist/TimePicker.css'
+import 'react-clock/dist/Clock.css'
 import { X, AlertCircle } from 'lucide-react'
 import { BookingForm, Booking } from '@/types'
 import { isValidExtension, isValidBooker } from '@/lib/utils'
@@ -27,6 +30,7 @@ export default function BookingModal({
   const [formData, setFormData] = useState<BookingForm>({
     booker: '',
     extension: '',
+    title: '',
     timeSlot: '',
     startTime: '',
     endTime: '',
@@ -127,6 +131,7 @@ export default function BookingModal({
     setFormData({ 
       booker: '', 
       extension: '', 
+      title: '',
       timeSlot: '', 
       startTime: '', 
       endTime: '',
@@ -231,46 +236,42 @@ export default function BookingModal({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">開始時間</label>
-                  <input
-                    type="time"
-                    value={formData.startTime || ''}
-                    onChange={(e) => {
-                      const startTime = e.target.value
+                  <TimePicker
+                    onChange={(value) => {
+                      const startTime = value as string
                       const endTime = formData.endTime || ''
                       const timeSlot = startTime && endTime ? `${startTime}-${endTime}` : ''
-                      setFormData(prev => ({ 
-                        ...prev, 
-                        startTime,
-                        timeSlot 
-                      }))
+                      setFormData(prev => ({ ...prev, startTime, timeSlot }))
                     }}
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.timeSlot ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    min="08:00"
-                    max="18:00"
+                    value={formData.startTime || null}
+                    locale="en-GB" // Force 24-hour format
+                    format="HH:mm"
+                    hourPlaceholder="hh"
+                    minutePlaceholder="mm"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    minTime="08:00"
+                    maxTime="18:00"
+                    disableClock
                   />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">結束時間</label>
-                  <input
-                    type="time"
-                    value={formData.endTime || ''}
-                    onChange={(e) => {
-                      const endTime = e.target.value
+                  <TimePicker
+                    onChange={(value) => {
+                      const endTime = value as string
                       const startTime = formData.startTime || ''
                       const timeSlot = startTime && endTime ? `${startTime}-${endTime}` : ''
-                      setFormData(prev => ({ 
-                        ...prev, 
-                        endTime,
-                        timeSlot 
-                      }))
+                      setFormData(prev => ({ ...prev, endTime, timeSlot }))
                     }}
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      errors.timeSlot ? 'border-red-300' : 'border-gray-300'
-                    }`}
-                    min="08:00"
-                    max="18:00"
+                    value={formData.endTime || null}
+                    locale="en-GB" // Force 24-hour format
+                    format="HH:mm"
+                    hourPlaceholder="hh"
+                    minutePlaceholder="mm"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    minTime={formData.startTime || "08:00"}
+                    maxTime="18:00"
+                    disableClock
                   />
                 </div>
               </div>
@@ -282,6 +283,20 @@ export default function BookingModal({
               {errors.timeSlot && (
                 <p className="mt-1 text-sm text-red-600">{errors.timeSlot}</p>
               )}
+            </div>
+
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                會議名稱 (選填)
+              </label>
+              <input
+                type="text"
+                id="title"
+                value={formData.title || ''}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="請輸入會議名稱"
+              />
             </div>
 
             <div>
