@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, addMonths, subMonths } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
@@ -19,7 +19,11 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
   
   const monthStart = startOfMonth(selectedMonth)
   const monthEnd = endOfMonth(selectedMonth)
-  const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd })
+
+  // Get the calendar range including days from previous/next month to fill the grid
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 }) // 0 = Sunday
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 })
+  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
 
   const getBookingCountForDate = (date: Date) => {
     const dateString = format(date, 'yyyy-MM-dd')
@@ -139,7 +143,7 @@ export default function Calendar({ roomId, currentDate, calendarData }: Calendar
         ))}
         
         {isLoading ? (
-          Array.from({ length: 35 }).map((_, i) => (
+          Array.from({ length: 42 }).map((_, i) => (
             <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
           ))
         ) : (
