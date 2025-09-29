@@ -43,8 +43,5 @@ next-env.d.ts
 # backups
 /backups/*.db
 
-# prisma
-/prisma/migrations/
-
 # claude
 .claude/
