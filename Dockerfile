@@ -27,6 +27,7 @@ RUN mkdir -p /app/data /app/backups
 # Set the database URL environment variable directly in the image
 ENV DATABASE_URL="file:/app/data/booking.db"
 ENV NODE_ENV="production"
+ENV PORT="3000"
 
 # Expose port
 EXPOSE 3000

@@ -4,8 +4,11 @@ services:
   app:
     type: dockerfile
     dockerfile: Dockerfile
+    ports:
+      - 3000
     environment:
       NODE_ENV: production
+      PORT: 3000
       DATABASE_URL: file:/app/data/booking.db
       BACKUP_SCHEDULE: "0 2 * * *"
       BACKUP_RETENTION_DAYS: "30"

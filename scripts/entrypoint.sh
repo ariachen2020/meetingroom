@@ -1,11 +1,25 @@
 #!/bin/sh
 set -e
 
+echo "=== Starting Meetingroom App ==="
+
 echo "Checking database directory..."
-mkdir -p /app/data
+mkdir -p /app/data /app/backups
 
-echo "Running database migrations..."
-npx prisma migrate deploy || echo "Migration failed, but continuing..."
+echo "Setting up database..."
+if [ ! -f "/app/data/booking.db" ]; then
+    echo "Database not found, creating new database..."
+    npx prisma migrate deploy || {
+        echo "Migration failed, trying db push..."
+        npx prisma db push || echo "Warning: Database setup failed"
+    }
+else
+    echo "Database exists, running migrations..."
+    npx prisma migrate deploy || echo "Warning: Migration failed, but continuing..."
+fi
 
-echo "Starting the application..."
+echo "Verifying Prisma client..."
+npx prisma generate
+
+echo "Starting Next.js application on port ${PORT:-3000}..."
 exec npm start
