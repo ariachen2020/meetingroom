@@ -19,9 +19,27 @@ export async function getBookings(): Promise<Booking[]> {
 }
 
 // Add a new booking
-export async function createBooking(booking: Omit<Booking, 'id' | 'createdAt'>): Promise<Booking> {
+export async function createBooking(booking: Omit<Booking, 'id' | 'createdAt' | 'orderIndex'>): Promise<Booking> {
+  // Calculate the next order index for this time slot
+  const existingBookings = await prisma.booking.findMany({
+    where: {
+      roomId: booking.roomId,
+      date: booking.date,
+      timeSlot: booking.timeSlot
+    },
+    orderBy: {
+      orderIndex: 'desc'
+    },
+    take: 1
+  })
+
+  const nextOrderIndex = existingBookings.length > 0 ? existingBookings[0].orderIndex + 1 : 1
+
   const newBooking = await prisma.booking.create({
-    data: booking
+    data: {
+      ...booking,
+      orderIndex: nextOrderIndex
+    }
   })
   return newBooking
 }
@@ -59,7 +77,11 @@ export async function getBookingsByRoomAndDate(roomId: string, date: string): Pr
       where: {
         roomId,
         date
-      }
+      },
+      orderBy: [
+        { timeSlot: 'asc' },
+        { orderIndex: 'asc' }
+      ]
     })
     return bookings
   } catch (error) {
@@ -70,7 +92,7 @@ export async function getBookingsByRoomAndDate(roomId: string, date: string): Pr
 
 // Create recurring bookings
 export async function createRecurringBookings(
-  bookingData: Omit<Booking, 'id' | 'createdAt' | 'title'> & { title?: string },
+  bookingData: Omit<Booking, 'id' | 'createdAt' | 'orderIndex' | 'title'> & { title?: string },
   recurring: { type: 'daily' | 'weekly' | 'monthly'; endDate: string }
 ): Promise<Booking[]> {
   const createdBookings: Booking[] = []
@@ -87,6 +109,7 @@ export async function createRecurringBookings(
     bookingsToCreate.push({
       ...bookingData,
       date: dateStr,
+      title: bookingData.title || null
     })
     
     // Calculate next date
@@ -104,11 +127,11 @@ export async function createRecurringBookings(
   }
 
   try {
-    // Using a transaction to ensure all or nothing
-    const result = await prisma.$transaction(
-      bookingsToCreate.map(b => prisma.booking.create({ data: b }))
-    )
-    createdBookings.push(...result)
+    // Create bookings sequentially to properly calculate order indexes
+    for (const bookingToCreate of bookingsToCreate) {
+      const booking = await createBooking(bookingToCreate)
+      createdBookings.push(booking)
+    }
   } catch (error) {
     console.error('Error creating recurring bookings:', error)
     // Depending on requirements, you might want to handle partial failures

@@ -178,7 +178,12 @@ export default function BookingModal({
                   <ul className="list-disc list-inside pl-4 space-y-1">
                     {conflictBookings.map(booking => (
                       <li key={booking.id}>
-                        {booking.booker} (分機: {booking.extension})
+                        <span className="inline-flex items-center gap-2">
+                          <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
+                            順序 {booking.orderIndex}
+                          </span>
+                          {booking.booker} (分機: {booking.extension})
+                        </span>
                       </li>
                     ))}
                   </ul>

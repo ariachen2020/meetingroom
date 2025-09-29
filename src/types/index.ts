@@ -6,6 +6,7 @@ export interface Booking {
   booker: string
   extension: string
   title: string | null
+  orderIndex: number
   createdAt: Date
 }
 

@@ -202,45 +202,73 @@ export default function DatePage({ params }: PageProps) {
               今日暫無預約
             </div>
           ) : (
-            bookings.map((booking) => (
-              <div key={booking.id} className="p-6 hover:bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Clock className="w-5 h-5 text-gray-400" />
-                      <span className="font-medium text-gray-900">
-                        {booking.timeSlot}
+            (() => {
+              // Group bookings by time slot to show order
+              const groupedBookings = bookings.reduce((groups, booking) => {
+                const key = booking.timeSlot
+                if (!groups[key]) {
+                  groups[key] = []
+                }
+                groups[key].push(booking)
+                return groups
+              }, {} as Record<string, Booking[]>)
+
+              return Object.entries(groupedBookings).map(([timeSlot, timeSlotBookings]) => (
+                <div key={timeSlot}>
+                  {timeSlotBookings.length > 1 && (
+                    <div className="px-6 py-3 bg-blue-50 border-b">
+                      <span className="text-sm font-medium text-blue-800">
+                        {timeSlot} 時段 - {timeSlotBookings.length} 個預約
                       </span>
                     </div>
-                    {booking.title && (
-                      <div className="flex items-center space-x-2">
-                        <BookText className="w-5 h-5 text-gray-400" />
-                        <span className="font-medium text-gray-900">{booking.title}</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center space-x-4 text-sm">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-700">{booking.booker}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-700">分機 {booking.extension}</span>
+                  )}
+                  {timeSlotBookings.map((booking) => (
+                    <div key={booking.id} className="p-6 hover:bg-gray-50 border-b last:border-b-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-2">
+                            <Clock className="w-5 h-5 text-gray-400" />
+                            <span className="font-medium text-gray-900">
+                              {booking.timeSlot}
+                              {timeSlotBookings.length > 1 && (
+                                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                  順序 {booking.orderIndex}
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                          {booking.title && (
+                            <div className="flex items-center space-x-2">
+                              <BookText className="w-5 h-5 text-gray-400" />
+                              <span className="font-medium text-gray-900">{booking.title}</span>
+                            </div>
+                          )}
+
+                          <div className="flex items-center space-x-4 text-sm">
+                            <div className="flex items-center space-x-2">
+                              <User className="w-4 h-4 text-gray-400" />
+                              <span className="text-gray-700">{booking.booker}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Phone className="w-4 h-4 text-gray-400" />
+                              <span className="text-gray-700">分機 {booking.extension}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => openDeleteModal(booking)}
+                          className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>刪除</span>
+                        </button>
                       </div>
                     </div>
-                  </div>
-
-                  <button
-                    onClick={() => openDeleteModal(booking)}
-                    className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    <span>刪除</span>
-                  </button>
+                  ))}
                 </div>
-              </div>
-            ))
+              ))
+            })()
           )}
         </div>
       </div>
