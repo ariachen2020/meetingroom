@@ -11,18 +11,20 @@ datasource db {
 }
 
 model Booking {
-  id         Int      @id @default(autoincrement())
-  roomId     String   @map("room_id")
-  date       String
-  timeSlot   String   @map("time_slot")
-  title      String?
-  booker     String
-  extension  String
-  orderIndex Int      @default(1) @map("order_index")
-  createdAt  DateTime @default(now()) @map("created_at")
+  id               Int      @id @default(autoincrement())
+  roomId           String   @map("room_id")
+  date             String
+  timeSlot         String   @map("time_slot")
+  title            String?
+  booker           String
+  extension        String
+  orderIndex       Int      @default(1) @map("order_index")
+  recurringGroupId String?  @map("recurring_group_id")
+  createdAt        DateTime @default(now()) @map("created_at")
 
   @@map("bookings")
   @@index([roomId, date])
   @@index([roomId, date, timeSlot])
   @@index([roomId, date, timeSlot, orderIndex])
+  @@index([recurringGroupId])
 }

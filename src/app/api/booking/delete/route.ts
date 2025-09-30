@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { deleteBooking, getBookingById } from '@/lib/storage'
+import { deleteBooking, getBookingById, deleteRecurringGroup, getRecurringGroupCount } from '@/lib/storage'
 
 export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json()
-    const { bookingId, extension } = body
+    const { bookingId, extension, deleteAll } = body
 
     if (!bookingId || typeof bookingId !== 'number') {
       return NextResponse.json(
@@ -47,6 +47,24 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
+    // If deleteAll is true and booking has a recurringGroupId, delete all in the group
+    if (deleteAll && booking.recurringGroupId) {
+      const result = await deleteRecurringGroup(booking.recurringGroupId)
+
+      if (!result.success) {
+        return NextResponse.json(
+          { message: '刪除循環預約失敗' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: `已刪除 ${result.deletedCount} 筆循環預約`
+      })
+    }
+
+    // Otherwise, delete only this single booking
     const success = await deleteBooking(bookingId)
 
     if (!success) {

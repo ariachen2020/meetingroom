@@ -38,7 +38,8 @@ export async function createBooking(booking: Omit<Booking, 'id' | 'createdAt' | 
   const newBooking = await prisma.booking.create({
     data: {
       ...booking,
-      orderIndex: nextOrderIndex
+      orderIndex: nextOrderIndex,
+      recurringGroupId: booking.recurringGroupId || null
     }
   })
   return newBooking
@@ -54,6 +55,42 @@ export async function deleteBooking(id: number): Promise<boolean> {
   } catch (error) {
     console.error(`Error deleting booking ${id}:`, error)
     return false
+  }
+}
+
+// Delete all bookings in a recurring group
+export async function deleteRecurringGroup(recurringGroupId: string): Promise<{ success: boolean; deletedCount: number }> {
+  try {
+    const result = await prisma.booking.deleteMany({
+      where: {
+        recurringGroupId,
+        date: {
+          gte: new Date().toISOString().split('T')[0]
+        }
+      }
+    })
+    return { success: true, deletedCount: result.count }
+  } catch (error) {
+    console.error(`Error deleting recurring group ${recurringGroupId}:`, error)
+    return { success: false, deletedCount: 0 }
+  }
+}
+
+// Get bookings count by recurring group ID
+export async function getRecurringGroupCount(recurringGroupId: string): Promise<number> {
+  try {
+    const count = await prisma.booking.count({
+      where: {
+        recurringGroupId,
+        date: {
+          gte: new Date().toISOString().split('T')[0]
+        }
+      }
+    })
+    return count
+  } catch (error) {
+    console.error(`Error counting recurring group ${recurringGroupId}:`, error)
+    return 0
   }
 }
 
@@ -92,26 +129,30 @@ export async function getBookingsByRoomAndDate(roomId: string, date: string): Pr
 
 // Create recurring bookings
 export async function createRecurringBookings(
-  bookingData: Omit<Booking, 'id' | 'createdAt' | 'orderIndex' | 'title'> & { title?: string },
+  bookingData: Omit<Booking, 'id' | 'createdAt' | 'orderIndex' | 'title' | 'recurringGroupId'> & { title?: string },
   recurring: { type: 'daily' | 'weekly' | 'monthly'; endDate: string }
 ): Promise<Booking[]> {
   const createdBookings: Booking[] = []
-  
+
+  // Generate a unique group ID for this recurring series
+  const recurringGroupId = `rec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
   const startDate = new Date(bookingData.date)
   const endDate = new Date(recurring.endDate)
   const currentDate = new Date(startDate)
-  
+
   const bookingsToCreate = []
 
   while (currentDate <= endDate) {
     const dateStr = currentDate.toISOString().split('T')[0]
-    
+
     bookingsToCreate.push({
       ...bookingData,
       date: dateStr,
-      title: bookingData.title || null
+      title: bookingData.title || null,
+      recurringGroupId
     })
-    
+
     // Calculate next date
     switch (recurring.type) {
       case 'daily':
@@ -137,6 +178,6 @@ export async function createRecurringBookings(
     // Depending on requirements, you might want to handle partial failures
     // For now, we just log the error and return what was created before the error
   }
-  
+
   return createdBookings
 }

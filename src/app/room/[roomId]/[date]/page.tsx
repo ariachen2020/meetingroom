@@ -27,6 +27,7 @@ export default function DatePage({ params }: PageProps) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('')
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null)
+  const [recurringCount, setRecurringCount] = useState(0)
   const [message, setMessage] = useState('')
 
   const fetchBookingsCallback = React.useCallback(async () => {
@@ -98,7 +99,7 @@ export default function DatePage({ params }: PageProps) {
     }
   }
 
-  const handleDelete = async (extension: string) => {
+  const handleDelete = async (extension: string, deleteAll: boolean) => {
     if (!selectedBooking) return { success: false, message: '無效的預約' }
 
     try {
@@ -109,17 +110,18 @@ export default function DatePage({ params }: PageProps) {
         },
         body: JSON.stringify({
           bookingId: selectedBooking.id,
-          extension
+          extension,
+          deleteAll
         }),
       })
 
       const result = await response.json()
 
       if (response.ok) {
-        setMessage('預約已刪除')
+        setMessage(result.message || '預約已刪除')
         await fetchBookingsCallback()
         setTimeout(() => setMessage(''), 3000)
-        return { success: true, message: '刪除成功' }
+        return { success: true, message: result.message || '刪除成功' }
       } else {
         return { success: false, message: result.message || '刪除失敗' }
       }
@@ -133,8 +135,25 @@ export default function DatePage({ params }: PageProps) {
     setBookingModalOpen(true)
   }
 
-  const openDeleteModal = (booking: Booking) => {
+  const openDeleteModal = async (booking: Booking) => {
     setSelectedBooking(booking)
+
+    // If booking has a recurringGroupId, fetch count of recurring bookings
+    if (booking.recurringGroupId) {
+      try {
+        const response = await fetch(`/api/bookings/recurring-count?groupId=${booking.recurringGroupId}`)
+        if (response.ok) {
+          const data = await response.json()
+          setRecurringCount(data.count || 0)
+        }
+      } catch (error) {
+        console.error('Failed to fetch recurring count:', error)
+        setRecurringCount(0)
+      }
+    } else {
+      setRecurringCount(0)
+    }
+
     setDeleteModalOpen(true)
   }
 
@@ -288,6 +307,7 @@ export default function DatePage({ params }: PageProps) {
           onClose={() => setDeleteModalOpen(false)}
           onConfirm={handleDelete}
           booking={selectedBooking}
+          recurringCount={recurringCount}
         />
       )}
     </div>

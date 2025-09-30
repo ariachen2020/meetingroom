@@ -7,6 +7,7 @@ export interface Booking {
   extension: string
   title: string | null
   orderIndex: number
+  recurringGroupId: string | null
   createdAt: Date
 }
 
@@ -40,4 +41,5 @@ export interface BookingForm {
 export interface DeleteBookingRequest {
   bookingId: number
   extension: string
+  deleteAll?: boolean
 }

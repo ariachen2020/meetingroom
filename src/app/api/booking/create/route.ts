@@ -70,7 +70,8 @@ export async function POST(request: NextRequest) {
       timeSlot,
       booker: booker.trim(),
       extension: extension.trim(),
-      title: title ? title.trim() : null
+      title: title ? title.trim() : null,
+      recurringGroupId: null
     }
 
     // Handle recurring bookings

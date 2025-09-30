@@ -7,14 +7,16 @@ import { Booking } from '@/types'
 interface DeleteModalProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (extension: string) => Promise<{ success: boolean; message: string }>
+  onConfirm: (extension: string, deleteAll: boolean) => Promise<{ success: boolean; message: string }>
   booking: Booking
+  recurringCount?: number
 }
 
-export default function DeleteModal({ isOpen, onClose, onConfirm, booking }: DeleteModalProps) {
+export default function DeleteModal({ isOpen, onClose, onConfirm, booking, recurringCount }: DeleteModalProps) {
   const [extension, setExtension] = useState('')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [deleteAll, setDeleteAll] = useState(false)
 
   if (!isOpen) return null
 
@@ -28,10 +30,10 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, booking }: Del
     }
 
     setIsSubmitting(true)
-    
+
     try {
-      const result = await onConfirm(extension)
-      
+      const result = await onConfirm(extension, deleteAll)
+
       if (result.success) {
         handleClose()
       } else {
@@ -47,6 +49,7 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, booking }: Del
   const handleClose = () => {
     setExtension('')
     setError('')
+    setDeleteAll(false)
     onClose()
   }
 
@@ -101,6 +104,26 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, booking }: Del
               <p className="mt-1 text-sm text-red-600">{error}</p>
             )}
           </div>
+
+          {recurringCount && recurringCount > 1 && (
+            <div className="border-t pt-4">
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  id="deleteAll"
+                  checked={deleteAll}
+                  onChange={(e) => setDeleteAll(e.target.checked)}
+                  className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 mt-0.5"
+                />
+                <label htmlFor="deleteAll" className="text-sm text-gray-700">
+                  <span className="font-medium">刪除所有循環預約</span>
+                  <p className="text-gray-500 mt-1">
+                    此預約是循環預約的一部分，共有 <span className="font-semibold text-red-600">{recurringCount}</span> 筆預約。勾選此選項將刪除所有未來的循環預約。
+                  </p>
+                </label>
+              </div>
+            </div>
+          )}
 
           <div className="flex space-x-3 pt-4">
             <button
