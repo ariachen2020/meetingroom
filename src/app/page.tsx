@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { MapPin, Users } from 'lucide-react'
+import { MapPin, Users, Info } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -11,6 +11,42 @@ export default function HomePage() {
         <p className="text-base sm:text-lg text-gray-600">
           請選擇您要預約的會議室
         </p>
+      </div>
+
+      {/* 使用說明 */}
+      <div className="mb-6 sm:mb-8 px-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
+          <div className="flex items-start space-x-3">
+            <Info className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-base sm:text-lg font-semibold text-blue-900 mb-2 sm:mb-3">
+                使用說明
+              </h3>
+              <ul className="space-y-2 text-sm sm:text-base text-blue-800">
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span><strong>新增預約：</strong>選擇會議室後，點擊日期和時段即可預約</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span><strong>循環預約：</strong>勾選「循環預約」可建立重複預約（每日/每週/每月）</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span><strong>刪除預約：</strong>點擊預約右側的「刪除」按鈕，輸入分機號碼驗證身份</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span><strong>批次刪除：</strong>刪除循環預約時，可勾選「刪除所有循環預約」一次移除整組</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span><strong>注意事項：</strong>只能刪除當天或未來的預約，分機號碼需與預約時相同</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-2xl mx-auto px-4">
