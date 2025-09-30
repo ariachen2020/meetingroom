@@ -148,38 +148,38 @@ export default function BookingModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-md w-full p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-3 sm:p-4 z-50">
+      <div className="bg-white rounded-xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             {showConflictWarning ? '預約衝突警告' : '新增預約'}
           </h3>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {showConflictWarning ? (
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
-              <div>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-start space-x-2 sm:space-x-3 p-3 sm:p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm sm:text-base">
                 <h4 className="font-medium text-orange-900 mb-2">
                   該時段已有預約，是否仍要預約？
                 </h4>
-                <div className="text-sm text-orange-800">
-                  <p className="mb-2">會議室：{roomId}</p>
-                  <p className="mb-2">日期：{date}</p>
-                  <p className="mb-2">時間：{timeSlot}</p>
-                  <p className="mb-2">現有預約：</p>
-                  <ul className="list-disc list-inside pl-4 space-y-1">
+                <div className="text-xs sm:text-sm text-orange-800">
+                  <p className="mb-1 sm:mb-2">會議室：{roomId}</p>
+                  <p className="mb-1 sm:mb-2">日期：{date}</p>
+                  <p className="mb-1 sm:mb-2">時間：{timeSlot}</p>
+                  <p className="mb-1 sm:mb-2">現有預約：</p>
+                  <ul className="list-disc list-inside pl-2 sm:pl-4 space-y-1">
                     {conflictBookings.map(booking => (
                       <li key={booking.id}>
-                        <span className="inline-flex items-center gap-2">
-                          <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
+                        <span className="inline-flex items-center gap-1 sm:gap-2">
+                          <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-orange-100 text-orange-800 text-xs font-medium rounded-full">
                             順序 {booking.orderIndex}
                           </span>
                           {booking.booker} (分機: {booking.extension})
@@ -191,17 +191,17 @@ export default function BookingModal({
               </div>
             </div>
 
-            <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <button
                 onClick={() => setShowConflictWarning(false)}
-                className="flex-1 btn btn-secondary"
+                className="flex-1 btn btn-secondary text-sm sm:text-base py-2"
                 disabled={isSubmitting}
               >
                 取消
               </button>
               <button
                 onClick={handleConflictConfirm}
-                className="flex-1 btn btn-primary"
+                className="flex-1 btn btn-primary text-sm sm:text-base py-2"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? '預約中...' : '仍要預約'}
@@ -209,36 +209,36 @@ export default function BookingModal({
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 會議室
               </label>
               <input
                 type="text"
                 value={`會議室 ${roomId}`}
                 readOnly
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-gray-50"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 日期
               </label>
               <input
                 type="text"
                 value={date}
                 readOnly
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-lg bg-gray-50"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 預約時間 *
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">開始時間</label>
                   <TimePicker
@@ -249,11 +249,11 @@ export default function BookingModal({
                       setFormData(prev => ({ ...prev, startTime, timeSlot }))
                     }}
                     value={formData.startTime || null}
-                    locale="en-GB" // Force 24-hour format
+                    locale="en-GB"
                     format="HH:mm"
                     hourPlaceholder="hh"
                     minutePlaceholder="mm"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full text-sm sm:text-base"
                     minTime="08:00"
                     maxTime="18:00"
                     disableClock
@@ -269,11 +269,11 @@ export default function BookingModal({
                       setFormData(prev => ({ ...prev, endTime, timeSlot }))
                     }}
                     value={formData.endTime || null}
-                    locale="en-GB" // Force 24-hour format
+                    locale="en-GB"
                     format="HH:mm"
                     hourPlaceholder="hh"
                     minutePlaceholder="mm"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full text-sm sm:text-base"
                     minTime={formData.startTime || "08:00"}
                     maxTime="18:00"
                     disableClock
@@ -281,17 +281,17 @@ export default function BookingModal({
                 </div>
               </div>
               {formData.startTime && formData.endTime && (
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-xs sm:text-sm text-gray-600">
                   預約時段：{formData.timeSlot}
                 </p>
               )}
               {errors.timeSlot && (
-                <p className="mt-1 text-sm text-red-600">{errors.timeSlot}</p>
+                <p className="mt-1 text-xs sm:text-sm text-red-600">{errors.timeSlot}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="title" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 會議名稱 (選填)
               </label>
               <input
@@ -299,13 +299,13 @@ export default function BookingModal({
                 id="title"
                 value={formData.title || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="請輸入會議名稱"
               />
             </div>
 
             <div>
-              <label htmlFor="booker" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="booker" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 預約人姓名 *
               </label>
               <input
@@ -313,18 +313,18 @@ export default function BookingModal({
                 id="booker"
                 value={formData.booker}
                 onChange={(e) => setFormData(prev => ({ ...prev, booker: e.target.value }))}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.booker ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="請輸入預約人姓名"
               />
               {errors.booker && (
-                <p className="mt-1 text-sm text-red-600">{errors.booker}</p>
+                <p className="mt-1 text-xs sm:text-sm text-red-600">{errors.booker}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="extension" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="extension" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 聯絡分機 *
               </label>
               <input
@@ -332,18 +332,18 @@ export default function BookingModal({
                 id="extension"
                 value={formData.extension}
                 onChange={(e) => setFormData(prev => ({ ...prev, extension: e.target.value }))}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.extension ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="請輸入聯絡分機"
               />
               {errors.extension && (
-                <p className="mt-1 text-sm text-red-600">{errors.extension}</p>
+                <p className="mt-1 text-xs sm:text-sm text-red-600">{errors.extension}</p>
               )}
             </div>
 
-            <div className="border-t pt-4">
-              <div className="flex items-center space-x-2 mb-3">
+            <div className="border-t pt-3 sm:pt-4">
+              <div className="flex items-center space-x-2 mb-2 sm:mb-3">
                 <input
                   type="checkbox"
                   id="recurring"
@@ -355,17 +355,17 @@ export default function BookingModal({
                       enabled: e.target.checked
                     }
                   }))}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <label htmlFor="recurring" className="text-sm font-medium text-gray-700">
+                <label htmlFor="recurring" className="text-xs sm:text-sm font-medium text-gray-700">
                   循環預約
                 </label>
               </div>
 
               {formData.recurring?.enabled && (
-                <div className="space-y-3 pl-6">
+                <div className="space-y-2 sm:space-y-3 pl-4 sm:pl-6">
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">重複頻率</label>
+                    <label className="block text-xs sm:text-sm text-gray-600 mb-1">重複頻率</label>
                     <select
                       value={formData.recurring.type}
                       onChange={(e) => setFormData(prev => ({
@@ -375,7 +375,7 @@ export default function BookingModal({
                           type: e.target.value as 'daily' | 'weekly' | 'monthly'
                         }
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="daily">每日</option>
                       <option value="weekly">每週</option>
@@ -383,7 +383,7 @@ export default function BookingModal({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">結束日期</label>
+                    <label className="block text-xs sm:text-sm text-gray-600 mb-1">結束日期</label>
                     <input
                       type="date"
                       value={formData.recurring.endDate}
@@ -394,7 +394,7 @@ export default function BookingModal({
                           endDate: e.target.value
                         }
                       }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       min={date}
                     />
                   </div>
@@ -402,18 +402,18 @@ export default function BookingModal({
               )}
             </div>
 
-            <div className="flex space-x-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-3 sm:pt-4">
               <button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 btn btn-secondary"
+                className="flex-1 btn btn-secondary text-sm sm:text-base py-2"
                 disabled={isSubmitting}
               >
                 取消
               </button>
               <button
                 type="submit"
-                className="flex-1 btn btn-primary"
+                className="flex-1 btn btn-primary text-sm sm:text-base py-2"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? '預約中...' : '確認預約'}

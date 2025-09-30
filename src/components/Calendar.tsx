@@ -103,45 +103,45 @@ export default function Calendar({ roomId, currentDate, calendarData: initialDat
     const isToday = format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
 
     let content
-    let linkClass = "flex flex-col items-center justify-center h-24 p-2 rounded-lg transition-all duration-200 relative"
+    let linkClass = "flex flex-col items-center justify-center h-16 sm:h-20 md:h-24 p-1 sm:p-2 rounded-lg transition-all duration-200 relative"
 
     // 今天的紅色圈圈
     if (isToday && isCurrentMonth) {
-      linkClass += " ring-2 ring-red-500"
+      linkClass += " ring-1 sm:ring-2 ring-red-500"
     }
 
     if (!isCurrentMonth) {
       linkClass += " text-gray-300 cursor-not-allowed"
       content = (
-        <span className="text-sm">{format(date, 'd')}</span>
+        <span className="text-xs sm:text-sm">{format(date, 'd')}</span>
       )
     } else if (bookingCount === 0) {
-      linkClass += " hover:bg-gray-100 border-2 border-gray-200"
+      linkClass += " hover:bg-gray-100 border border-gray-200 sm:border-2"
       content = (
-        <span className={`text-sm ${isToday ? 'text-red-600 font-bold' : 'text-gray-700'}`}>
+        <span className={`text-xs sm:text-sm ${isToday ? 'text-red-600 font-bold' : 'text-gray-700'}`}>
           {format(date, 'd')}
         </span>
       )
     } else {
-      linkClass += " hover:bg-blue-50 border-2 border-blue-200 bg-blue-50"
-      const maxDisplaySlots = 3
+      linkClass += " hover:bg-blue-50 border border-blue-200 sm:border-2 bg-blue-50"
+      const maxDisplaySlots = 2
       const displaySlots = timeSlots.slice(0, maxDisplaySlots)
       const remainingCount = timeSlots.length - maxDisplaySlots
 
       content = (
         <>
-          <span className={`text-sm mb-1 font-medium ${isToday ? 'text-red-600' : 'text-blue-700'}`}>
+          <span className={`text-xs sm:text-sm mb-0.5 sm:mb-1 font-medium ${isToday ? 'text-red-600' : 'text-blue-700'}`}>
             {format(date, 'd')}
           </span>
-          <div className="flex flex-col items-center space-y-0.5 text-xs w-full">
+          <div className="flex flex-col items-center space-y-0.5 text-[10px] sm:text-xs w-full">
             {displaySlots.map((slot, index) => (
-              <div key={index} className="px-1 py-0.5 bg-blue-100 text-blue-800 rounded text-xs leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+              <div key={index} className="px-0.5 sm:px-1 py-0.5 bg-blue-100 text-blue-800 rounded leading-tight whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
                 {slot}
               </div>
             ))}
             {remainingCount > 0 && (
-              <div className="px-1 py-0.5 bg-orange-100 text-orange-800 rounded text-xs leading-tight">
-                +{remainingCount}個
+              <div className="px-0.5 sm:px-1 py-0.5 bg-orange-100 text-orange-800 rounded leading-tight">
+                +{remainingCount}
               </div>
             )}
           </div>
@@ -169,57 +169,57 @@ export default function Calendar({ roomId, currentDate, calendarData: initialDat
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-white rounded-xl shadow-lg p-3 sm:p-4 md:p-6">
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
         <button
           onClick={previousMonth}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
-        
-        <h2 className="text-xl font-semibold text-gray-900">
+
+        <h2 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">
           {format(selectedMonth, 'yyyy年 M月', { locale: zhTW })}
         </h2>
-        
+
         <button
           onClick={nextMonth}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-1 sm:gap-2">
         {['日', '一', '二', '三', '四', '五', '六'].map(day => (
-          <div key={day} className="text-center font-medium text-gray-500 py-2">
+          <div key={day} className="text-center font-medium text-gray-500 py-1 sm:py-2 text-xs sm:text-sm">
             {day}
           </div>
         ))}
-        
+
         {isLoading ? (
           Array.from({ length: 42 }).map((_, i) => (
-            <div key={i} className="h-24 bg-gray-100 rounded-lg animate-pulse"></div>
+            <div key={i} className="h-16 sm:h-20 md:h-24 bg-gray-100 rounded-lg animate-pulse"></div>
           ))
         ) : (
           calendarDays.map(renderCalendarDay)
         )}
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-4 text-sm text-gray-600">
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 border-2 border-gray-200 rounded"></div>
+      <div className="mt-4 sm:mt-6 flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-gray-200 rounded"></div>
           <span>無預約</span>
         </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-blue-100 border-2 border-blue-200 rounded"></div>
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <div className="w-3 h-3 sm:w-4 sm:h-4 bg-blue-100 border-2 border-blue-200 rounded"></div>
           <span>顯示預約時段</span>
         </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 bg-orange-100 border border-orange-200 rounded text-xs flex items-center justify-center">+</div>
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <div className="w-3 h-3 sm:w-4 sm:h-4 bg-orange-100 border border-orange-200 rounded text-xs flex items-center justify-center">+</div>
           <span>更多時段</span>
         </div>
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-gray-500 w-full sm:w-auto">
           點擊日期查看完整預約詳情
         </div>
       </div>

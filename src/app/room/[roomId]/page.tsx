@@ -99,28 +99,28 @@ export default async function RoomPage({ params, searchParams }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center mb-8">
+      <div className="flex items-center mb-4 sm:mb-6 md:mb-8 px-2 sm:px-0">
         <Link
           href="/"
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="flex items-center space-x-1 sm:space-x-2 text-gray-600 hover:text-gray-900 transition-colors text-sm sm:text-base"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           <span>返回會議室選擇</span>
         </Link>
       </div>
 
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center space-x-3 mb-4">
+      <div className="text-center mb-6 sm:mb-8 px-4">
+        <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
           {roomId === 'A' ? (
-            <MapPin className="w-8 h-8 text-blue-600" />
+            <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
           ) : (
-            <Users className="w-8 h-8 text-blue-600" />
+            <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
           )}
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             會議室 {roomId}
           </h1>
         </div>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           點擊日期查看詳細預約資訊或進行預約
         </p>
       </div>
