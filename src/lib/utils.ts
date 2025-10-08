@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from 'clsx'
+import { isExtensionAllowed } from '@/config/allowed-extensions'
 
 export function cn(...inputs: ClassValue[]) {
   return clsx(inputs)
@@ -43,7 +44,12 @@ export function isValidTimeSlot(timeSlot: string): boolean {
 }
 
 export function isValidExtension(extension: string): boolean {
-  return /^\d{3,5}$/.test(extension)
+  // 檢查格式：3-5位數字
+  if (!/^\d{3,5}$/.test(extension)) {
+    return false
+  }
+  // 檢查是否在允許清單中
+  return isExtensionAllowed(extension)
 }
 
 export function isValidBooker(booker: string): boolean {

@@ -54,8 +54,12 @@ export default function BookingModal({
       newErrors.booker = '預約人姓名需要2-20個字元'
     }
 
-    if (!isValidExtension(formData.extension)) {
+    if (!formData.extension) {
+      newErrors.extension = '請輸入分機號碼'
+    } else if (!/^\d{3,5}$/.test(formData.extension)) {
       newErrors.extension = '分機號碼需要3-5位數字'
+    } else if (!isValidExtension(formData.extension)) {
+      newErrors.extension = '此分機號碼無權預約會議室'
     }
 
     if (!formData.startTime || !formData.endTime) {

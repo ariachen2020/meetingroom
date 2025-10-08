@@ -36,10 +36,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!extension) {
+      return NextResponse.json(
+        { message: '請輸入分機號碼' },
+        { status: 400 }
+      )
+    }
+
+    if (!/^\d{3,5}$/.test(extension)) {
+      return NextResponse.json(
+        { message: '分機號碼格式錯誤（需為3-5位數字）' },
+        { status: 400 }
+      )
+    }
+
     if (!isValidExtension(extension)) {
       return NextResponse.json(
-        { message: '請輸入正確的分機號碼（3-5位數字）' },
-        { status: 400 }
+        { message: '此分機號碼無權預約會議室' },
+        { status: 403 }
       )
     }
 
